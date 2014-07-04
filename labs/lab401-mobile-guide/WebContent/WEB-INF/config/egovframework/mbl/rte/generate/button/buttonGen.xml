@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE requestToXml SYSTEM "../file_generate_spec.dtd">
+
+<requestToXml id="button">
+  <elementList datetime="Fri Nov 11 15:39:15 KST 2011">
+    <requestParameter key="compCount">
+      <parameterValue>1</parameterValue>
+    </requestParameter>
+    <requestParameter key="compHeight_1">
+      <parameterValue>css:egov-btn-small</parameterValue>
+    </requestParameter>
+    <requestParameter key="compWidth_1">
+      <parameterValue />
+    </requestParameter>
+    <requestParameter key="xmlStatus">
+      <parameterValue>makeXml</parameterValue>
+    </requestParameter>
+    <requestParameter key="compColor_1">
+      <parameterValue>attr:data-theme=a</parameterValue>
+    </requestParameter>
+    <requestParameter key="compShape_1">
+      <parameterValue />
+    </requestParameter>
+    <requestParameter key="compText_1">
+      <parameterValue>Button 1</parameterValue>
+    </requestParameter>
+  </elementList>
+</requestToXml>
+

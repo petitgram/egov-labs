@@ -1,0 +1,13 @@
+@CHARSET "UTF-8";
+
+/*
+.ui-icon-beer {
+	background-image: url(/images/egovframework/mbl/beer.png);
+	background-repeat: no-repeat;
+}
+*/
+
+.ui-icon-[ideal_icon_name] {
+	background-image: url(/images/egovframework/mbl/cmm/[icon_filename]);
+	background-repeat: no-repeat;
+}

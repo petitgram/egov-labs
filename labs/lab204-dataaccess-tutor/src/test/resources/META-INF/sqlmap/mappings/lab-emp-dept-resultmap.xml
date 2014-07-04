@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="EmpResultMap">
+
+	<typeAlias alias="empWithDeptVO" type="egovframework.lab.dataaccess.service.EmpWithDeptVO" />
+	<typeAlias alias="empIncludesDeptVO" type="egovframework.lab.dataaccess.service.EmpIncludesDeptVO" />
+	<typeAlias alias="deptIncludesEmpListVO" type="egovframework.lab.dataaccess.service.DeptIncludesEmpListVO" />
+
+	<resultMap id="empWithDeptResult" class="empWithDeptVO" extends="Emp.empResult">
+		<!--<result property="deptNo" column="DEPT_NO"/>-->
+		<result property="deptName" column="DEPT_NAME"/>
+		<result property="loc" column="LOC"/>
+	</resultMap>
+	
+	<resultMap id="empIncludesDeptResult" class="empIncludesDeptVO" extends="Emp.empResult">
+		<!--
+			Emp-Dept 1:1 relation
+			테스트 결과 resultMap 의 참조 시 sql-map-config.xml 의
+			useStatementNamespaces="false" 와 상관없이 namespace prefix 를 써야 하는듯
+		-->
+		<result property="deptVO" resultMap="Dept.deptResult" />
+	</resultMap>
+	
+	<!-- 1:N 인 경우 groupBy 속성을 명시 -->
+	<resultMap id="deptIncludesEmpListResult" class="deptIncludesEmpListVO" extends="Dept.deptResult" groupBy="deptNo">
+		<!-- Dept-EmpList 1:N relation -->
+		<result property="empVOList" resultMap="Emp.empResult" />
+	</resultMap>
+	
+	
+	<select id="selectEmpWithDept" parameterClass="empVO" resultMap="empWithDeptResult">
+		<![CDATA[
+			select EMP_NO,
+				   EMP_NAME,
+				   JOB,
+				   MGR,
+				   HIRE_DATE,
+				   SAL,
+				   COMM,
+				   A.DEPT_NO,
+				   B.DEPT_NAME,
+				   B.LOC
+			  from EMP A, DEPT B
+			 where A.DEPT_NO = B.DEPT_NO 
+			   and A.EMP_NO = #empNo#
+		]]>
+	</select>
+	
+	<select id="selectEmpIncludesDept" parameterClass="empVO" resultMap="empIncludesDeptResult">
+		<![CDATA[
+			select EMP_NO,
+				   EMP_NAME,
+				   JOB,
+				   MGR,
+				   HIRE_DATE,
+				   SAL,
+				   COMM,
+				   A.DEPT_NO,
+				   B.DEPT_NAME,
+				   B.LOC
+			  from EMP A, DEPT B
+			 where A.DEPT_NO = B.DEPT_NO 
+			   and A.EMP_NO = #empNo#
+		]]>
+	</select>
+	
+	<select id="selectDeptIncludesEmpList" parameterClass="deptVO" resultMap="deptIncludesEmpListResult">
+		<![CDATA[
+			select   A.DEPT_NO as DEPT_NO,
+			         DEPT_NAME,
+			         LOC,
+			         EMP_NO,
+			         EMP_NAME,
+			         JOB,
+			         MGR,
+			         HIRE_DATE,
+			         SAL,
+			         COMM
+			from     DEPT A,
+			         EMP B
+			where    A.DEPT_NO = B.DEPT_NO
+			         and A.DEPT_NO = #deptNo#
+			order by B.EMP_NO
+		]]>
+	</select>
+
+	
+</sqlMap>

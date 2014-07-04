@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+ 
+<sqlMap namespace="Dept">
+ 
+	<typeAlias alias="deptVO" type="egovframework.lab.dataaccess.service.DeptVO" />
+ 
+	<resultMap id="deptResult" class="deptVO">
+		<result property="deptNo" column="DEPT_NO" />
+		<result property="deptName" column="DEPT_NAME" />
+		<result property="loc" column="LOC" />
+	</resultMap>
+ 
+	<insert id="insertDept" parameterClass="deptVO">
+		insert into DEPT
+		           (DEPT_NO,
+		            DEPT_NAME,
+		            LOC)
+		values     (#deptNo#,
+		            #deptName#,
+		            #loc#)
+	</insert>
+ 
+	<select id="selectDept" parameterClass="deptVO" resultMap="deptResult">
+		<![CDATA[
+			select DEPT_NO,
+			       DEPT_NAME,
+			       LOC
+			from   DEPT
+			where  DEPT_NO = #deptNo#
+		]]>
+	</select>
+ 
+	<update id="updateDept" parameterClass="deptVO">
+		update DEPT
+		set    DEPT_NAME = #deptName#,
+		       LOC = #loc#
+		where  DEPT_NO = #deptNo#
+	</update>
+ 
+	<delete id="deleteDept" parameterClass="deptVO">
+		delete from DEPT
+		where       DEPT_NO = #deptNo#
+	</delete>
+ 
+	<select id="selectDeptList" parameterClass="deptVO" resultMap="deptResult">
+		<![CDATA[
+			select DEPT_NO,
+			       DEPT_NAME,
+			       LOC
+			from   DEPT
+			where  1 = 1
+		]]>
+		<isNotNull prepend="and" property="deptNo">
+			DEPT_NO = #deptNo#
+		</isNotNull>
+		<isNotNull prepend="and" property="deptName">
+			DEPT_NAME LIKE '%' || #deptName# || '%'
+		</isNotNull>
+	</select>
+ 
+</sqlMap>

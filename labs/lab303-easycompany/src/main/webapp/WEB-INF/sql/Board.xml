@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="BOARD">
+
+	<!--
+		Table infomation Column_Name ID PK Null? DATA_TYPE Default
+		~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		num 1 Y N INT Auto_increment title 2 N VARCHAR(40) content 3 N TEXT
+		name 2 N VARCHAR(20) password 2 N VARCHAR(20) ip 2 N VARCHAR(15)
+		input_date 4 N DATETIME hit 2 N INT update_date 4 N DATETIME level 2 N
+		z INT ref 2 N INT step 2 N INT board_div 2 N INT
+	-->
+
+	<typeAlias alias="BoardDomain" type="com.microflower.board.model.Board" />
+
+
+	<!--
+
+		파라미터 맵을 사용 했을 경우 parameterMap으로 세팅 시켜 줘야된다. <parameterMap class="str"
+		id="paramstr"> <parameter property="str"/> </parameterMap> 각각 쿼리문에서는
+		이렇게~~~~~~~~~~~~~~ <select id="getListAreaNews" parameterMap="paramstr"
+		resultMap="Board" > SELECT num,title,content,input_date FROM
+		mainboard_areanews <isNotEmpty property="str"> where title LIKE #str#
+		</isNotEmpty> ORDER BY num DESC </select> <select id="Dbcount"
+		resultClass="num" parameterMap="paramstr"> SELECT COUNT(*) as num FROM
+		mainboard_areanews <isNotEmpty property="str"> where title LIKE #str#
+		</isNotEmpty> </select>
+	-->
+
+
+	<!-- 리스트 뿌릴때 Board resultMap -->
+	<resultMap id="Board" class="BoardDomain">
+		<result property="num" column="num" javaType="Integer" />
+		<result property="title" column="title" javaType="String" />
+		<result property="content" column="content" javaType="String" />
+		<result property="name" column="name" javaType="String" />
+		<result property="password" column="password" javaType="String" />
+		<result property="ip" column="ip" javaType="String" />
+		<result property="input_date" column="input_date" javaType="Date" />
+		<result property="hit" column="hit" javaType="Integer" />
+		<result property="update_date" column="update_date" javaType="Date" />
+		<result property="level" column="level" javaType="Integer" />
+		<result property="ref" column="ref" javaType="Integer" />
+		<result property="step" column="step" javaType="Integer" />
+		<result property="board_div" column="board_div" javaType="Integer" />
+		<result property="boardmanager.boardname" column="boardname" />
+		<result property="boardmanager.activeYN" column="activeYN" />
+		<result property="boardmanager.replyYN" column="replyYN" />
+	</resultMap>
+
+
+	<!-- 글보기 - 검색대상 간략화 -->
+	<resultMap id="getOneBoard" class="BoardDomain">
+		<result property="num" column="num" javaType="Integer" />
+		<result property="title" column="title" javaType="String" />
+		<result property="content" column="content" javaType="String" />
+		<result property="name" column="name" javaType="String" />
+		<result property="ip" column="ip" javaType="String" />
+		<result property="input_date" column="input_date" javaType="Date" />
+		<result property="hit" column="hit" javaType="Integer" />
+		<result property="update_date" column="update_date" javaType="Date" />
+		<result property="level" column="level" javaType="Integer" />
+		<result property="board_div" column="board_div" javaType="Integer" />
+	</resultMap>
+
+
+	<!-- 해당 글의 상세정보 -->
+	<resultMap id="getDetailBoard" class="BoardDomain">
+		<result property="num" column="num" javaType="Integer" />
+		<result property="title" column="title" javaType="String" />
+		<result property="content" column="content" javaType="String" />
+		<result property="name" column="name" javaType="String" />
+		<result property="password" column="password" javaType="String" />
+		<result property="ip" column="ip" javaType="String" />
+		<result property="input_date" column="input_date" javaType="Date" />
+		<result property="hit" column="hit" javaType="Integer" />
+		<result property="update_date" column="update_date" javaType="Date" />
+		<result property="level" column="level" javaType="Integer" />
+		<result property="ref" column="ref" javaType="Integer" />
+		<result property="step" column="step" javaType="Integer" />
+		<result property="board_div" column="board_div" javaType="Integer" />
+	</resultMap>
+
+
+	<!-- 글등록 -->
+	<insert id="insertBoard" parameterClass="com.microflower.board.model.Board">
+		<![CDATA[
+			INSERT INTO board(num,title,content,name,password,ip,input_date,hit,update_date,level,ref,step,board_div) 
+			VALUES (#num#,#title#,#content#,#name#,#password#,#ip#,now(),0,now(),#level#,#num#,0,#board_div#)
+		]]>
+	</insert>
+
+	<!-- 글수정 -->
+	<update id="updateBoard" parameterClass="com.microflower.board.model.Board">
+		<![CDATA[
+			UPDATE board 
+			SET title=#title#,
+			    content=#content#,
+			    ip=#ip#,
+			    update_date=now(),
+			    password=#password#  
+			WHERE num=#num# 
+		]]>
+	</update>
+
+	<!-- 글삭제 -->
+	<delete id="deleteBoard" parameterClass="java.lang.Integer">
+		<![CDATA[
+			DELETE FROM board 
+			WHERE num=#value#
+		]]>
+	</delete>
+
+	<!-- 글목록 -->
+	<select id="getListBoard" parameterClass="com.microflower.board.model.PageBean"
+		resultMap="Board">
+
+		SELECT b.num,b.title,b.name,b.content,b.password,b.ip,b.input_date,
+		b.hit,b.update_date,b.level,b.ref,b.step,b.board_div,
+		bm.boardname,bm.activeYN,bm.replyYN
+		FROM board b,boardmanager bm
+
+		<isNotEmpty property="word">
+			WHERE b.title LIKE '%' || #word# || '%' AND b.board_div=bm.board_div AND #board_div#=b.board_div  
+		</isNotEmpty>
+		
+		<isEmpty property="word">
+			WHERE b.board_div=bm.board_div AND #board_div#=b.board_div 
+		</isEmpty>
+		
+		ORDER BY b.num DESC 
+	</select>
+	
+	<!-- 글목록(XML추출) -->
+	<select id="getListBoardXML" parameterClass="com.microflower.board.model.PageBean" resultClass="xml" xmlResultName="board" >
+	
+		SELECT b.num,b.title,b.name,b.content,b.password,b.ip,b.input_date,b.hit,b.update_date,b.level,b.ref,b.step,b.board_div,bm.boardname 
+		FROM board b,boardmanager bm 
+
+		<isNotEmpty property="word">
+			WHERE b.title LIKE '%'||#word#||'%' AND b.board_div=bm.board_div AND #board_div#=b.board_div  
+		</isNotEmpty>
+		
+		<isEmpty property="word">
+			WHERE b.board_div=bm.board_div AND #board_div#=b.board_div 
+		</isEmpty>
+		
+		ORDER BY b.num DESC 
+	</select>
+	
+	<!-- 글하나의 정보 가지고 오기 -->
+	<select id="getOneBoard" resultMap="getOneBoard" parameterClass="java.lang.Integer">
+		<![CDATA[
+			SELECT num,title,content,name,ip,input_date,hit,update_date,level,board_div 
+			FROM board 
+			WHERE num=#value# 
+		]]>
+	</select>
+	
+	<!-- 글총갯수 -->
+	<select id="DbCount" resultClass="java.lang.Integer" parameterClass="com.microflower.board.model.PageBean">
+	
+			SELECT COUNT(*) as num 
+			FROM board 
+
+			<isNotEmpty property="word">
+				WHERE title LIKE '%' || #word# || '%' AND #board_div#=board_div
+			</isNotEmpty>
+			
+			<isEmpty property="word">
+				WHERE #board_div#=board_div 
+			</isEmpty>
+	</select>
+	
+	<!-- 조회수 증가 시키기 -->
+	<update id="updateHit" parameterClass="java.lang.Integer">
+		<![CDATA[
+			UPDATE board 
+			SET hit=hit+1 	    
+			WHERE num=#value# 
+		]]>
+	</update>
+	
+	<!-- 글상세정보 가지고 오기 -->
+	<select id="getDetailBoard" resultMap="getDetailBoard" parameterClass="java.lang.Integer">
+		<![CDATA[
+			SELECT num,title,name,content,password,ip,input_date,
+				   hit,update_date,level,ref,step,board_div 
+			FROM board 
+			WHERE num=#value# 
+		]]>
+	</select>
+
+</sqlMap>
